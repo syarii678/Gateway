@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>QRIS Pembayaran - <%= botname %></title>
+  <script>
+    // Fungsi polling untuk mengecek status pembayaran setiap 8 detik
+    function checkPayment() {
+      fetch('/check-payment?txId=<%= transactionId %>')
+        .then(response => response.json())
+        .then(data => {
+          if(data.status === 'paid'){
+            document.getElementById('status').innerText = data.message;
+            clearInterval(polling);
+          } else if(data.status === 'error') {
+            document.getElementById('status').innerText = data.message;
+            clearInterval(polling);
+          } else {
+            document.getElementById('status').innerText = data.message;
+          }
+        })
+        .catch(err => console.error(err));
+    }
+    const polling = setInterval(checkPayment, 8000);
+
+    // Fungsi untuk membatalkan transaksi
+    function cancelPayment() {
+      fetch('/cancel', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ txId: '<%= transactionId %>' })
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message);
+        clearInterval(polling);
+        window.location.href = "/";
+      })
+      .catch(err => console.error(err));
+    }
+  </script>
+</head>
+<body>
+  <h1>QRIS Pembayaran</h1>
+  <p>
+    <strong>ID Transaksi:</strong> <%= transactionId %><br>
+    <strong>Total Pembayaran:</strong> Rp<%= amount %><br>
+    <strong>Barang:</strong> Panel Pterodactyl<br>
+    <strong>Masa Berlaku:</strong> <%= expireMinutes %> menit<br>
+  </p>
+  <img src="<%= qrImageUrl %>" alt="QR Code Pembayaran" width="250">
+  <p id="status">Menunggu pembayaran...</p>
+  <button onclick="cancelPayment()">Batalkan Pembelian</button>
+</body>
+</html>

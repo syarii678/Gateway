@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Pembelian Panel - <%= botname %></title>
+</head>
+<body>
+  <h1>Pilih Panel Pterodactyl</h1>
+  <form action="/purchase" method="POST">
+    <% panelOptions.forEach(option => { %>
+      <div>
+        <input type="radio" name="option" value="<%= option.value %>" id="<%= option.value %>" required>
+        <label for="<%= option.value %>">
+          <strong><%= option.title %></strong> - <%= option.harga %>
+        </label>
+      </div>
+    <% }) %>
+    <br>
+    <button type="submit">Beli Panel</button>
+  </form>
+</body>
+</html>
